@@ -1,0 +1,5 @@
+set(mycode_SRCS
+	${CMAKE_CURRENT_SOURCE_DIR}/myGui.cpp
+	PARENT_SCOPE
+)
+
