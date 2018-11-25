@@ -51,12 +51,11 @@ public:
 	bool use_hotbar_image = false;
 	std::string hotbar_selected_image = "";
 	bool use_hotbar_selected_image = false;
-
+    bool use_fastmove_image = true;
 	Hud(gui::IGUIEnvironment *guienv, Client *client, LocalPlayer *player,
 			Inventory *inventory);
 	~Hud();
 
-    void drawFastWalk();
 
 	void drawHotbar(u16 playeritem);
 	void resizeHotbar();

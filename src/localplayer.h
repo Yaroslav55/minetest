@@ -71,7 +71,10 @@ public:
 	bool physics_override_new_move = true;
 
 	v3f overridePosition;
-    float fast_walk = 1.4;                      // *** CHANGED ***
+    float fast_walk = 2;                      // *** CHANGED ***
+    int time_fast_walk = 200;
+    static int timer;
+
 	void move(f32 dtime, Environment *env, f32 pos_max_d);
 	void move(f32 dtime, Environment *env, f32 pos_max_d,
 			std::vector<CollisionInfo> *collision_info);
@@ -159,6 +162,7 @@ private:
 	aabb3f m_sneak_node_bb_top = aabb3f(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 	// Whether the player is allowed to sneak
 	bool m_sneak_node_exists = false;
+
 	// Whether a "sneak ladder" structure is detected at the players pos
 	// see detectSneakLadder() in the .cpp for more info (always false if disabled)
 	bool m_sneak_ladder_detected = false;

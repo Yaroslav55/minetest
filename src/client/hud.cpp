@@ -115,23 +115,12 @@ Hud::~Hud()
 {
 	if (m_selection_mesh)
 		m_selection_mesh->drop();
+    g_settings->set("fast_move", bool_to_cstr(false));
 }
 
 void Hud::drawItem(const ItemStack &item, const core::rect<s32>& rect,
 		bool selected)
 {
-//    core::rect<s32> imgrect2 = rect;
-//    imgrect2.UpperLeftCorner.X  -= (m_padding*3);
-//    imgrect2.UpperLeftCorner.Y  -= (m_padding*3);
-//    imgrect2.LowerRightCorner.X += (m_padding*3);
-//    imgrect2.LowerRightCorner.Y += (m_padding*3);
-
-//    video::ITexture *texture = tsrc->getTexture("test.png");
-//    core::dimension2di imgsize(texture->getOriginalSize());
-
-//    draw2DImageFilterScaled(driver, texture, imgrect2,
-//        core::rect<s32>(core::position2d<s32>(1,1), imgsize),
-//        NULL, hbar_colors, true);
 
 	if (selected) {
 		/* draw hihlighting around selected item */
@@ -248,19 +237,25 @@ void Hud::drawItems(v2s32 upperleftpos, v2s32 screen_offset, s32 itemcount,
         else
             use_hotbar_selected_image = false;
     }
-
     // draw customized item background
+    core::rect<s32> imgrect2(-m_padding/2, -m_padding/2,
+        width+m_padding/2, height+m_padding/2);
+    core::rect<s32> rect2 = imgrect2 + pos;
     if (use_hotbar_image) {
-        core::rect<s32> imgrect2(-m_padding/2, -m_padding/2,
-            width+m_padding/2, height+m_padding/2);
-        core::rect<s32> rect2 = imgrect2 + pos;
         video::ITexture *texture = tsrc->getTexture(hotbar_image);
         core::dimension2di imgsize(texture->getOriginalSize());
         draw2DImageFilterScaled(driver, texture, rect2,
             core::rect<s32>(core::position2d<s32>(0,0), imgsize),
             NULL, hbar_colors, true);
     }
-
+    if( use_fastmove_image && g_settings->getBool("fast_move") ) {
+        rect2 = core::rect<s32>(450, 850, 500, 900);
+        video::ITexture *texture = tsrc->getTexture("fastmove.png");
+        core::dimension2di imgsize(texture->getOriginalSize());
+        draw2DImageFilterScaled(driver, texture, rect2,
+            core::rect<s32>(core::position2d<s32>(0,0), imgsize),
+            NULL, hbar_colors, true);
+    }
     // Draw items
     core::rect<s32> imgrect(0, 0, m_hotbar_imagesize, m_hotbar_imagesize);
     for (s32 i = inv_offset; i < itemcount && (size_t)i < mainlist->getSize(); i++) {
@@ -454,27 +449,6 @@ void Hud::drawStatbar(v2s32 pos, u16 corner, u16 drawdir, std::string texture,
     }
 }
 
-void Hud::drawFastWalk(  ) {
-//    v2s32 centerlowerpos(m_displaycenter.X, m_screensize.Y);
-//    // Position of upper left corner of bar
-//    v2s32 pos1 = centerlowerpos - v2s32(width / 2, m_hotbar_imagesize + m_padding * 3);
-//    v2s32 pos = v2s32(0, 0);
-//    pos.X *= m_hud_scaling * RenderingEngine::getDisplayDensity();
-//    pos.Y *= m_hud_scaling * RenderingEngine::getDisplayDensity();
-//    pos += pos1;
-
-    //core::rect<s32> imgrect2(100,100, 300, 300);
-    if (player->hud_flags & HUD_FLAG_FASTMOVE_VISIBLE) {
-        core::rect<s32> tex_pos(100,100, 150, 150);
-        video::ITexture *texture = tsrc->getTexture("test.png");
-        core::dimension2di imgsize(texture->getOriginalSize());
-
-        draw2DImageFilterScaled(driver, texture, tex_pos,
-                                core::rect<s32>(core::position2d<s32>(0,0), imgsize),
-                                NULL, hbar_colors, true);
-    }
-
-}
 void Hud::drawHotbar(u16 playeritem) {
 
     v2s32 centerlowerpos(m_displaycenter.X, m_screensize.Y);
@@ -495,6 +469,7 @@ void Hud::drawHotbar(u16 playeritem) {
         if (player->hud_flags & HUD_FLAG_HOTBAR_VISIBLE) {
             drawItems(pos, v2s32(0, 0), hotbar_itemcount, 0, mainlist, playeritem + 1, 0);
         }
+
     } else {
         pos.X += width/4;
 

@@ -464,7 +464,7 @@ void LocalPlayer::move(f32 dtime, Environment *env, f32 pos_max_d)
 {
 	move(dtime, env, pos_max_d, NULL);
 }
-
+int LocalPlayer::timer = 0;
 void LocalPlayer::applyControl(float dtime, Environment *env)
 {
 	// Clear stuff
@@ -498,9 +498,8 @@ void LocalPlayer::applyControl(float dtime, Environment *env)
 	bool continuous_forward = player_settings.continuous_forward;
 	bool always_fly_fast = player_settings.always_fly_fast;
 
-	// Whether superspeed mode is used or not
+    // Whether superspeed mode is used or not
     bool superspeed = false;
-
 	if (always_fly_fast && free_move && fast_move)
 		superspeed = true;
 
@@ -657,15 +656,32 @@ void LocalPlayer::applyControl(float dtime, Environment *env)
 	}
 
 	// The speed of the player (Y is ignored)
-	if(superspeed || (is_climbing && fast_climb) || ((in_liquid || in_liquid_stable) && fast_climb))
+    if(superspeed || (is_climbing && fast_climb) ||
+            ((in_liquid || in_liquid_stable) && fast_climb))  {
 		speedH = speedH.normalize() * movement_speed_fast;
+    }
 	else if(control.sneak && !free_move && !in_liquid && !in_liquid_stable)
-		speedH = speedH.normalize() * movement_speed_crouch;
-    else if( fast_move )                        // ** FAST WALK
-        speedH = speedH.normalize() * movement_speed_walk * fast_walk;
-	else
-		speedH = speedH.normalize() * movement_speed_walk;
-
+        speedH = speedH.normalize() * movement_speed_crouch;
+    else if( fast_move )  {     // ** FAST MOVE **
+        if( timer < time_fast_walk ){
+            LocalPlayer::timer++;
+            if( timer < 20 ) {
+                speedH = speedH.normalize() * movement_speed_walk * fast_walk * 2;
+            }
+            else if( timer < (time_fast_walk - 20) ) {
+                speedH = speedH.normalize() * movement_speed_walk * fast_walk ;
+            }
+            else {
+                speedH = speedH.normalize() * movement_speed_walk * fast_walk / 1.5;
+            }
+        }
+        else {
+            g_settings->set("fast_move", bool_to_cstr(false));
+            fast_move = false;
+        }
+    }
+    else
+        speedH = speedH.normalize() * movement_speed_walk;
 	// Acceleration increase
 	f32 incH = 0; // Horizontal (X, Z)
 	f32 incV = 0; // Vertical (Y)

@@ -91,7 +91,6 @@ void RenderingCore::drawHUD()
 		camera->drawNametags();
 		if (mapper && show_minimap)
 			mapper->drawMinimap();
-        hud->drawFastWalk( );
 	}
 	guienv->drawAll();
 }

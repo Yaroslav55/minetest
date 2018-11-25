@@ -92,16 +92,15 @@ Player::~Player()
 
 u32 Player::addHud(HudElement *toadd)
 {
-	MutexAutoLock lock(m_mutex);
+    MutexAutoLock lock(m_mutex);
 
 	u32 id = getFreeHudID();
-
 	if (id < hud.size())
 		hud[id] = toadd;
-	else
+    else {
 		hud.push_back(toadd);
-
-	return id;
+    }
+    return id;
 }
 
 HudElement* Player::getHud(u32 id)

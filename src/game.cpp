@@ -789,7 +789,7 @@ private:
 	void handleClientEvent_ShowLocalFormSpec(ClientEvent *event, CameraOrientation *cam);
 	void handleClientEvent_HandleParticleEvent(ClientEvent *event,
 		CameraOrientation *cam);
-	void handleClientEvent_HudAdd(ClientEvent *event, CameraOrientation *cam);
+    void handleClientEvent_HudAdd(ClientEvent *event, CameraOrientation *cam);
 	void handleClientEvent_HudRemove(ClientEvent *event, CameraOrientation *cam);
 	void handleClientEvent_HudChange(ClientEvent *event, CameraOrientation *cam);
 	void handleClientEvent_SetSky(ClientEvent *event, CameraOrientation *cam);
@@ -2107,11 +2107,10 @@ void Game::toggleFast()
     bool fast_move = !g_settings->getBool("fast_move");
     g_settings->set("fast_move", bool_to_cstr(fast_move));
     if (fast_move) {
-        //ClientEvent event = new ClientEvent;
-        //event->hudadd(  );
-        //player_damageclient->pushToEventQueue(event);
+        LocalPlayer::timer = 0;
         m_game_ui->showTranslatedStatusText("Fast mode enabled");
     } else {
+        LocalPlayer::timer = 100;
         m_game_ui->showTranslatedStatusText("Fast mode disabled");
     }
 
@@ -2577,7 +2576,7 @@ void Game::handleClientEvent_HandleParticleEvent(ClientEvent *event,
 	client->getParticleManager()->handleParticleEvent(event, client, player);
 }
 
-void Game::handleClientEvent_HudAdd(ClientEvent *event, CameraOrientation *cam)
+void Game::handleClientEvent_HudAdd(ClientEvent *event, CameraOrientation *cam = nullptr)
 {
 	LocalPlayer *player = client->getEnv().getLocalPlayer();
 	auto &hud_server_to_client = client->getHUDTranslationMap();
@@ -2602,7 +2601,7 @@ void Game::handleClientEvent_HudAdd(ClientEvent *event, CameraOrientation *cam)
 	e->pos    = *event->hudadd.pos;
 	e->name   = *event->hudadd.name;
 	e->scale  = *event->hudadd.scale;
-	e->text   = *event->hudadd.text;
+    e->text   = *event->hudadd.text;
 	e->number = event->hudadd.number;
 	e->item   = event->hudadd.item;
 	e->dir    = event->hudadd.dir;
